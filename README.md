@@ -4,4 +4,4 @@
 Нужные модули для работы:
 openai
 discord.py
-langdetect
+langid
