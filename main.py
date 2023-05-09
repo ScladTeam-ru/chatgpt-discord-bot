@@ -1,7 +1,7 @@
 import openai
 import discord
 from discord.ext import commands
-from langdetect import detect
+import langid
 
 # Создаем Discord клиента
 intents = discord.Intents.default()
@@ -21,10 +21,13 @@ async def on_message(message):
         return
 
     # Определяем язык сообщения, которое нужно перевести
-    lang = detect_language(message.content)
+    lang, conf = langid.classify(message.content)
 
     # Получаем ответ на сообщение с помощью OpenAI
-    engine_id = "text-davinci-002"
+    if lang == 'ru':
+        engine_id = "text-davinci-002"
+    else:
+        engine_id = "text-davinci-002"
     response = openai.Completion.create(
         engine=engine_id,
         prompt=message.content,
@@ -40,13 +43,8 @@ async def on_message(message):
     # Отправляем ответ на сообщение в Discord
     await message.channel.send(generated_text)
 
-# Функция определения языка сообщения, используя библиотеку langdetect
-def detect_language(text):
-    try:
-        lang = detect(text)
-    except:
-        lang = "en"
-    return lang
+    # Обрабатываем команды Discord
+    await client.process_commands(message)
 
 # Запускаем клиент Discord
 client.run('X')
